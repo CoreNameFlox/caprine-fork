@@ -39,7 +39,7 @@ import {caprineIconPath} from './constants';
 ipc.setMaxListeners(100);
 
 electronDebug({
-	isEnabled: true, // TODO: This is only enabled to allow `Command+R` because messenger.com sometimes gets stuck after computer waking up
+	isEnabled: true, // TODO: This is only enabled to allow `Command+R` because facebook.com sometimes gets stuck after computer waking up
 	showDevTools: false,
 });
 
@@ -236,7 +236,8 @@ function initRequestsFiltering(): void {
 function setUserLocale(): void {
 	const userLocale = bestFacebookLocaleFor(app.getLocale().replace('-', '_'));
 	const cookie = {
-		url: 'https://www.messenger.com/',
+		/* Replaced to facebook.com due to messenger.com shutting down */
+		url: 'https://www.facebook.com/',
 		name: 'locale',
 		secure: true,
 		value: userLocale,
@@ -264,7 +265,7 @@ function createMainWindow(): BrowserWindow {
 	// Messenger or Work Chat
 	const mainURL = config.get('useWorkChat')
 		? 'https://work.facebook.com/chat'
-		: 'https://www.messenger.com/login/';
+		: 'https://www.facebook.com/messages/';
 
 	const win = new BrowserWindow({
 		title: app.name,
@@ -532,15 +533,24 @@ function createMainWindow(): BrowserWindow {
 	});
 
 	webContents.on('will-navigate', async (event, url) => {
-		const isMessengerDotCom = (url: string): boolean => {
-			const {hostname} = new URL(url);
-			return hostname.endsWith('.messenger.com');
+		const isFBMessages = (url: string): boolean => {
+			const {hostname, pathname} = new URL(url);
+			if (hostname !== 'www.facebook.com') {
+				return false;
+			}
+
+			return (
+				pathname.startsWith('/messages')
+				|| pathname.startsWith('/login')
+				|| pathname.startsWith('/checkpoint')
+				|| pathname.startsWith('/two_step_verification')
+			);
 		};
 
-		const isTwoFactorAuth = (url: string): boolean => {
+		/* const isTwoFactorAuth = (url: string): boolean => {
 			const twoFactorAuthURL = 'https://www.facebook.com/checkpoint';
 			return url.startsWith(twoFactorAuthURL);
-		};
+		}; */
 
 		const isWorkChat = (url: string): boolean => {
 			const {hostname, pathname} = new URL(url);
@@ -565,7 +575,7 @@ function createMainWindow(): BrowserWindow {
 			return false;
 		};
 
-		if (isMessengerDotCom(url) || isTwoFactorAuth(url) || isWorkChat(url)) {
+		if (isFBMessages(url) || isWorkChat(url)) {
 			return;
 		}
 
