@@ -126,23 +126,9 @@ ipc.answerMain('new-room', async () => {
 });
 
 ipc.answerMain('log-out', async () => {
-	const useWorkChat = await ipc.callMain<undefined, boolean>('get-config-useWorkChat');
-	if (useWorkChat) {
-		document.querySelector<HTMLElement>('._5lxs._3qct._p')!.click();
-
-		// Menu creation is slow
-		setTimeout(() => {
-			const nodes = document.querySelectorAll<HTMLElement>(
-				'._54nq._9jo._558b._2n_z li:last-child a',
-			);
-
-			nodes[nodes.length - 1].click();
-		}, 250);
-	} else {
-		await withSettingsMenu(() => {
-			selectMenuItem(-1);
-		});
-	}
+	const logoutButton = [...document.querySelectorAll<HTMLElement>('[role="button"]')]
+		.find(el => el.textContent?.trim() === 'Log out');
+	logoutButton?.click();
 });
 
 ipc.answerMain('find', () => {

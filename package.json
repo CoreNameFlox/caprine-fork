@@ -21,7 +21,7 @@
 		"lint": "npm run lint:xo && npm run lint:stylelint",
 		"test:tsc": "npm run build",
 		"test": "npm run test:tsc && npm run lint",
-		"start": "tsc && electron .",
+		"start": "tsc && electron . --enable-features=UseOzonePlatform --ozone-platform=wayland",
 		"build": "tsc",
 		"dist:linux": "electron-builder --linux",
 		"dist:mac": "electron-builder --mac",
@@ -149,6 +149,10 @@
 			]
 		},
 		"linux": {
+			"executableArgs": [
+				"--enable-features=UseOzonePlatform",
+        		"--ozone-platform=wayland"
+			],
 			"target": [
 				"AppImage",
 				"deb"
