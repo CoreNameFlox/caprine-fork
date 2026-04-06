@@ -104,6 +104,15 @@ async function getIcon(element: HTMLElement, unread: boolean): Promise<string> {
 	return element.getAttribute(unread ? icon.unread : icon.read)!;
 }
 
+function isUnreadConversation(element: HTMLElement): boolean {
+	for (const child of element.querySelectorAll<HTMLElement>('div, span')) {
+		if (child.childElementCount === 0 && child.textContent?.trim() === 'Unread message:') {
+			return true;
+		}
+	}
+	return false;
+}
+
 async function getLabel(element: HTMLElement): Promise<string> {
 	if (isNull(element)) {
 		return '';
@@ -131,7 +140,7 @@ async function createConversationNewDesign(element: HTMLElement): Promise<Conver
 	*/
 
 	conversation.selected = Boolean(element.querySelector('[role=row] [role=link] > div:only-child'));
-	conversation.unread = Boolean(element.querySelector('[aria-label="Mark as Read"]'));
+	conversation.unread = isUnreadConversation(element);
 
 	const unparsedLabel = element.querySelector<HTMLElement>('.a8c37x1j.ni8dbmo4.stjgntxs.l9j0dhe7 > span > span')!;
 	conversation.label = await getLabel(unparsedLabel);
@@ -247,10 +256,14 @@ function countUnread(mutationsList: MutationRecord[]): void {
 		if (!bodyText || !titleText || !imgUrl) {
 			continue;
 		}
+		// Trying to fix the notifications on linux (swaync, etc...)
+		const notificationId = Math.abs(href.split('').reduce((acc, char) => {
+			return ((acc << 5) - acc) + char.charCodeAt(0);
+		}, 0));
 
 		// Send a notification
 		ipc.callMain('notification', {
-			id: 0,
+			id: notificationId,
 			title: titleText,
 			body: bodyText,
 			icon: imgUrl,
@@ -259,31 +272,26 @@ function countUnread(mutationsList: MutationRecord[]): void {
 	}
 }
 
-async function updateTrayIcon(): Promise<void> {
+function updateTrayIcon(): void {
+	const rows = document.querySelectorAll<HTMLElement>('[role=grid] [role=row]');
 	let messageCount = 0;
 
-	await elementReady(selectors.chatsIcon, {stopOnDomReady: false});
-
-	// Count unread messages in Chats, Marketplace, etc.
-	for (const element of document.querySelectorAll<HTMLElement>(selectors.chatsIcon)) {
-		// Extract messageNumber from ariaLabel
-		const messageNumber = element?.ariaLabel?.match(/\d+/g);
-
-		if (messageNumber) {
-			messageCount += Number.parseInt(messageNumber[0], 10);
+	for (const row of rows) {
+		if (isUnreadConversation(row)) {
+			messageCount++;
 		}
 	}
-
+	console.log('updateTrayIcon called, count:', messageCount); 
 	ipc.callMain('update-tray-icon', messageCount);
 }
 
 window.addEventListener('load', async () => {
 	const sidebar = await elementReady('[role=navigation]:has([role=grid])', {stopOnDomReady: false});
-	const leftSidebar = await elementReady(`${selectors.leftSidebar}:has(${selectors.chatsIcon})`, {stopOnDomReady: false});
 
 	if (sidebar) {
 		const conversationListObserver = new MutationObserver(async () => sendConversationList());
 		const conversationCountObserver = new MutationObserver(countUnread);
+		const trayIconObserver = new MutationObserver(updateTrayIcon);
 
 		conversationListObserver.observe(sidebar, {
 			subtree: true,
@@ -299,16 +307,12 @@ window.addEventListener('load', async () => {
 			attributes: true,
 			attributeFilter: ['src', 'alt'],
 		});
-	}
 
-	if (leftSidebar) {
-		const chatsIconObserver = new MutationObserver(async () => updateTrayIcon());
-
-		chatsIconObserver.observe(leftSidebar, {
-			subtree: true,
+		trayIconObserver.observe(sidebar, {
 			childList: true,
-			attributes: true,
-			attributeFilter: ['aria-label'],
+			subtree: true,
 		});
+
+		updateTrayIcon();
 	}
 });

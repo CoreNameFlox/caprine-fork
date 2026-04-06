@@ -4,7 +4,7 @@
 	<a href="https://github.com/sindresorhus/caprine">
 		<img src="media/AppIcon-readme.png" width="200" height="200">
 	</a>
-	<h1>Caprine</h1>
+	<h1>caprine-fork</h1>
 	<p>
 		<b>Elegant Facebook Messenger desktop app</b>
 	</p>
@@ -68,7 +68,7 @@ Or with [Homebrew](https://brew.sh): `$ brew install caprine`
 	<tr>
 		<td>Arch Linux</td>
 		<td>Community</td>
-		<td align="center">✔️</td>
+		<td align="center">❌</td>
 		<td>Frederik Schwan</td>
 		<td><code>pacman -S caprine</code></td>
 	</tr>
@@ -84,7 +84,7 @@ Or with [Homebrew](https://brew.sh): `$ brew install caprine`
 	<tr>
 		<td>Debian / Ubuntu (deb-get)</td>
 		<td>GitHub</td>
-		<td align="center">✔️</td>
+		<td align="center">❌</td>
 		<td>Official</td>
 		<td>
 			Follow the <a href=#installation-using-deb-get>instructions below</a>
@@ -93,7 +93,7 @@ Or with [Homebrew](https://brew.sh): `$ brew install caprine`
 	<tr>
 		<td>Debian / Ubuntu (APT)</td>
 		<td>Gemfury</td>
-		<td align="center">✔️</td>
+		<td align="center">❌</td>
 		<td>Lefteris Garyfalakis</td>
 		<td>
 			Follow the <a href=#apt-repository-gemfury>instructions below</a>
@@ -102,7 +102,7 @@ Or with [Homebrew](https://brew.sh): `$ brew install caprine`
 	<tr>
 		<td>RHEL / Fedora / openSUSE</td>
 		<td>Copr</td>
-		<td align="center">✔️</td>
+		<td align="center">❌</td>
 		<td>Dušan Simić</td>
 		<td>
 			Follow the <a href=#copr>instructions below</a>
@@ -111,28 +111,10 @@ Or with [Homebrew](https://brew.sh): `$ brew install caprine`
 	<tr>
 		<td>AppImage</td>
 		<td>GitHub</td>
-		<td align="center">✔️</td>
+		<td align="center">❌</td>
 		<td>Official</td>
 		<td>
 			Follow the <a href=#appimage>instructions below</a>
-		</td>
-	</tr>
-	<tr>
-		<td>Flatpak</td>
-		<td>Flathub</td>
-		<td align="center">✔️</td>
-		<td>Dušan Simić</td>
-		<td>
-			Visit <a href="https://flathub.org/apps/details/com.sindresorhus.Caprine">Flathub</a> and follow the instructions
-		</td>
-	</tr>
-	<tr>
-		<td>Snap</td>
-		<td>Snapcraft</td>
-		<td align="center">✔️</td>
-		<td>Official</td>
-		<td>
-			Visit <a href="https://snapcraft.io/caprine">Snapcraft</a> and follow the instructions
 		</td>
 	</tr>
 </table>

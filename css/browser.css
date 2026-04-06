@@ -280,3 +280,26 @@ body.show-message-buttons .s8sjc6am.z6erz7xo.alzwoclg.jcxyg2ei.i85zmo3j.b0ur3jhr
 body.show-message-buttons .cgu29s5g.alzwoclg.oo5upp5e {
 	margin-left: 15px !important;
 }
+
+/* Hide Facebook top navigation bar */
+[data-pagelet="NavBar"],
+[data-pagelet="MSiteNavBar"],
+[role="banner"],
+div[aria-label="Facebook"],
+div[data-testid="navigation"] {
+    display: none !important;
+}
+[data-pagelet="LeftRail"] {
+    display: none !important;
+}
+
+/* Hide right Facebook sidebar */
+[data-pagelet="RightRail"] {
+    display: none !important;
+}
+
+/* Make Messenger fill the full window */
+[data-pagelet="MessengerGraphQLThreadlist"],
+[data-pagelet="MercuryThreadInbox"] {
+    height: 100vh !important;
+}
