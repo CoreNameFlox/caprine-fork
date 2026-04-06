@@ -10,7 +10,6 @@ import {
 	Menu,
 	Notification,
 	MenuItemConstructorOptions,
-	systemPreferences,
 	nativeTheme,
 } from 'electron';
 import {ipcMain as ipc} from 'electron-better-ipc';
@@ -535,7 +534,7 @@ function createMainWindow(): BrowserWindow {
 	webContents.on('will-navigate', async (event, url) => {
 		const isFBMessages = (url: string): boolean => {
 			const {hostname, pathname} = new URL(url);
-			if (hostname !== 'www.facebook.com') {
+			if (hostname !== 'www.facebook.com' && hostname !== 'l.facebook.com' && !hostname.endsWith('.facebook.com')) {
 				return false;
 			}
 
@@ -544,13 +543,14 @@ function createMainWindow(): BrowserWindow {
 				|| pathname.startsWith('/login')
 				|| pathname.startsWith('/checkpoint')
 				|| pathname.startsWith('/two_step_verification')
+				|| pathname.startsWith('/logout.php')
+        		|| pathname.startsWith('/confirm')
+        		|| pathname.startsWith('/recover')
+        		|| pathname.startsWith('/ajax')
+        		|| pathname.startsWith('/dialog')
+        		|| pathname === '/'
 			);
 		};
-
-		/* const isTwoFactorAuth = (url: string): boolean => {
-			const twoFactorAuthURL = 'https://www.facebook.com/checkpoint';
-			return url.startsWith(twoFactorAuthURL);
-		}; */
 
 		const isWorkChat = (url: string): boolean => {
 			const {hostname, pathname} = new URL(url);
@@ -591,27 +591,73 @@ if (is.macos) {
 	});
 }
 
-function toggleMaximized(): void {
-	if (mainWindow.isMaximized()) {
-		mainWindow.unmaximize();
-	} else {
-		mainWindow.maximize();
-	}
-}
-
-ipc.answerRenderer('titlebar-doubleclick', () => {
-	if (is.macos) {
-		const doubleClickAction = systemPreferences.getUserDefault('AppleActionOnDoubleClick', 'string');
-
-		if (doubleClickAction === 'Minimize') {
-			mainWindow.minimize();
-		} else if (doubleClickAction === 'Maximize') {
-			toggleMaximized();
+ipc.answerRenderer(
+	'notification',
+	({id, title, body, icon, silent}: {id: number; title: string; body: string; icon: string; silent: boolean}) => {
+		if (mainWindow.isFocused()) {
+			return;
 		}
-	} else {
-		toggleMaximized();
-	}
-});
+
+		if (is.linux) {
+			// Use notify-send directly for proper SwayNC/libnotify support
+			const {execFile} = require('node:child_process');
+			const {writeFileSync, mkdtempSync} = require('node:fs');
+			const {tmpdir} = require('node:os');
+			const path = require('node:path');
+
+			try {
+				// Save icon to temp file
+				const base64Data = icon.replace(/^data:image\/\w+;base64,/, '');
+				const tmpDir = mkdtempSync(path.join(tmpdir(), 'caprine-'));
+				const iconPath = path.join(tmpDir, 'icon.png');
+				writeFileSync(iconPath, Buffer.from(base64Data, 'base64'));
+
+				execFile('notify-send', [
+					`--icon=${iconPath}`,
+					'--urgency=normal',
+					'--expire-time=0',
+					'--app-name=Caprine',
+					title,
+					body,
+				], () => {
+					try {
+						require('node:fs').rmSync(tmpDir, {recursive: true});
+					} catch {}
+				});
+			} catch (error) {
+				console.error('notify-send failed:', error);
+			}
+			return;
+		}
+
+		const notification = new Notification({
+			title,
+			body: config.get('notificationMessagePreview') ? body : 'You have a new message',
+			hasReply: true,
+			icon: nativeImage.createFromDataURL(icon),
+			silent,
+		});
+
+		notifications.set(id, notification);
+
+		notification.on('click', () => {
+			sendAction('notification-callback', {callbackName: 'onclick', id});
+			notifications.delete(id);
+		});
+
+		notification.on('reply', (_event, reply: string) => {
+			sendBackgroundAction('notification-reply-callback', {callbackName: 'onclick', id, reply});
+			notifications.delete(id);
+		});
+
+		notification.on('close', () => {
+			sendBackgroundAction('notification-callback', {callbackName: 'onclose', id});
+			notifications.delete(id);
+		});
+
+		notification.show();
+	},
+);
 
 app.on('activate', () => {
 	if (mainWindow) {
@@ -643,9 +689,10 @@ ipc.answerRenderer(
 		const notification = new Notification({
 			title,
 			body: config.get('notificationMessagePreview') ? body : 'You have a new message',
-			hasReply: true,
+			hasReply: !is.linux,
 			icon: nativeImage.createFromDataURL(icon),
 			silent,
+			urgency: 'normal',
 		});
 
 		notifications.set(id, notification);
