@@ -322,9 +322,7 @@ Then edit the automatically created GitHub Releases draft and publish.
 
 ## Maintainers
 
-Original Caprine Developer 👑
-- [Sindre Sorhus](https://github.com/sindresorhus)
-
+- [👑 Sindre Sorhus](https://github.com/sindresorhus)
 - [Dušan Simić](https://github.com/dusansimic)
 - [Lefteris Garyfalakis](https://github.com/lefterisgar)
 - [Michael Quevillon](https://github.com/mquevill)
