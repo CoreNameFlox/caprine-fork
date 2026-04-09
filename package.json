@@ -1,7 +1,7 @@
 {
-	"name": "caprine",
-	"productName": "Caprine",
-	"version": "2.61.0",
+	"name": "caprine-fork",
+	"productName": "Caprine Fork",
+	"version": "2.61.1",
 	"description": "Elegant Facebook Messenger desktop app",
 	"license": "MIT",
 	"repository": "sindresorhus/caprine",

@@ -10,7 +10,6 @@ import {
 	Menu,
 	Notification,
 	MenuItemConstructorOptions,
-	nativeTheme,
 } from 'electron';
 import {ipcMain as ipc} from 'electron-better-ipc';
 import {autoUpdater} from 'electron-updater';
@@ -261,10 +260,8 @@ function setNotificationsMute(status: boolean): void {
 function createMainWindow(): BrowserWindow {
 	const lastWindowState = config.get('lastWindowState');
 
-	// Messenger or Work Chat
-	const mainURL = config.get('useWorkChat')
-		? 'https://work.facebook.com/chat'
-		: 'https://www.facebook.com/messages/';
+	// Messenger
+	const mainURL = 'https://www.facebook.com/messages/'
 
 	const win = new BrowserWindow({
 		title: app.name,
@@ -277,7 +274,7 @@ function createMainWindow(): BrowserWindow {
 		minWidth: 400,
 		minHeight: 200,
 		alwaysOnTop: config.get('alwaysOnTop'),
-		titleBarStyle: 'hiddenInset',
+		titleBarStyle: is.macos ? 'hiddenInset' : 'default',
 		trafficLightPosition: {
 			x: 80,
 			y: 20,
@@ -365,6 +362,14 @@ function createMainWindow(): BrowserWindow {
 	return win;
 }
 
+// This probably run with Wayland completely (if not working)
+if (process.env.XDG_SESSION_TYPE === 'wayland') {
+	app.commandLine.appendSwitch('ozone-platform', 'wayland');
+	app.commandLine.appendSwitch('enable-features', 'WaylandWindowDecorations');
+} else {
+	app.commandLine.appendSwitch('ozone-platform-hint', 'auto');
+}
+
 (async () => {
 	await Promise.all([ensureOnline(), app.whenReady()]);
 	await updateAppMenu();
@@ -446,12 +451,6 @@ function createMainWindow(): BrowserWindow {
 			}
 		}
 
-		if (config.get('useWorkChat') && existsSync(path.join(cssPath, 'workchat.css'))) {
-			webContents.insertCSS(
-				readFileSync(path.join(cssPath, 'workchat.css'), 'utf8'),
-			);
-		}
-
 		if (existsSync(path.join(app.getPath('userData'), 'custom.css'))) {
 			webContents.insertCSS(readFileSync(path.join(app.getPath('userData'), 'custom.css'), 'utf8'));
 		}
@@ -530,54 +529,39 @@ function createMainWindow(): BrowserWindow {
 
 		return {action: 'allow'};
 	});
-
+	
+	/* 
+	TODO : This probably fixes the "After 2FA" (Stuck at Checkpoint 2FA Screen) it'll work?
+	TESTED AND WORKING - JHAY
+	*/
 	webContents.on('will-navigate', async (event, url) => {
-		const isFBMessages = (url: string): boolean => {
-			const {hostname, pathname} = new URL(url);
-			if (hostname !== 'www.facebook.com' && hostname !== 'l.facebook.com' && !hostname.endsWith('.facebook.com')) {
-				return false;
-			}
-
-			return (
-				pathname.startsWith('/messages')
-				|| pathname.startsWith('/login')
-				|| pathname.startsWith('/checkpoint')
-				|| pathname.startsWith('/two_step_verification')
-				|| pathname.startsWith('/logout.php')
-        		|| pathname.startsWith('/confirm')
-        		|| pathname.startsWith('/recover')
-        		|| pathname.startsWith('/ajax')
-        		|| pathname.startsWith('/dialog')
-        		|| pathname === '/'
-			);
-		};
-
-		const isWorkChat = (url: string): boolean => {
-			const {hostname, pathname} = new URL(url);
-
-			if (hostname === 'work.facebook.com' || hostname === 'work.workplace.com') {
-				return true;
-			}
-
+		console.log('will-navigate:', url);
+		try {
+			const {hostname} = new URL(url);
 			if (
-				// Example: https://company-name.facebook.com/login or
-				//   		https://company-name.workplace.com/login
-				(hostname.endsWith('.facebook.com') || hostname.endsWith('.workplace.com'))
-				&& (pathname.startsWith('/login') || pathname.startsWith('/chat'))
+				hostname === 'www.facebook.com'
+				|| hostname === 'l.facebook.com'
+				|| hostname.endsWith('.facebook.com')
 			) {
-				return true;
+				return;
 			}
+		} catch {}
 
-			if (hostname === 'login.microsoftonline.com') {
-				return true;
+		event.preventDefault();
+		await shell.openExternal(url);
+	});
+
+	webContents.on('will-redirect', async (event, url) => {
+		try {
+			const {hostname} = new URL(url);
+			if (
+				hostname === 'www.facebook.com'
+				|| hostname === 'l.facebook.com'
+				|| hostname.endsWith('.facebook.com')
+			) {
+				return;
 			}
-
-			return false;
-		};
-
-		if (isFBMessages(url) || isWorkChat(url)) {
-			return;
-		}
+		} catch {}
 
 		event.preventDefault();
 		await shell.openExternal(url);
@@ -590,6 +574,8 @@ if (is.macos) {
 		mainWindow.setVibrancy('sidebar');
 	});
 }
+
+const notifications = new Map();
 
 ipc.answerRenderer(
 	'notification',
@@ -668,62 +654,14 @@ app.on('activate', () => {
 app.on('before-quit', () => {
 	isQuitting = true;
 
-	// Checking whether the window exists to work around an Electron race issue:
-	// https://github.com/sindresorhus/caprine/issues/809
 	if (mainWindow) {
-		const {isMaximized} = config.get('lastWindowState');
+		const lastWindowState = config.get('lastWindowState');
+		const isMaximized = lastWindowState?.isMaximized ?? false;
 		config.set('lastWindowState', {...mainWindow.getNormalBounds(), isMaximized});
 	}
 });
 
-const notifications = new Map();
-
-ipc.answerRenderer(
-	'notification',
-	({id, title, body, icon, silent}: {id: number; title: string; body: string; icon: string; silent: boolean}) => {
-		// Don't send notifications when the window is focused
-		if (mainWindow.isFocused()) {
-			return;
-		}
-
-		const notification = new Notification({
-			title,
-			body: config.get('notificationMessagePreview') ? body : 'You have a new message',
-			hasReply: !is.linux,
-			icon: nativeImage.createFromDataURL(icon),
-			silent,
-			urgency: 'normal',
-		});
-
-		notifications.set(id, notification);
-
-		notification.on('click', () => {
-			sendAction('notification-callback', {callbackName: 'onclick', id});
-
-			notifications.delete(id);
-		});
-
-		notification.on('reply', (_event, reply: string) => {
-			// We use onclick event used by messenger to go to the right convo
-			sendBackgroundAction('notification-reply-callback', {callbackName: 'onclick', id, reply});
-
-			notifications.delete(id);
-		});
-
-		notification.on('close', () => {
-			sendBackgroundAction('notification-callback', {callbackName: 'onclose', id});
-			notifications.delete(id);
-		});
-
-		notification.show();
-	},
-);
-
-type ThemeSource = typeof nativeTheme.themeSource;
-
-ipc.answerRenderer<undefined, StoreType['useWorkChat']>('get-config-useWorkChat', async () => config.get('useWorkChat'));
 ipc.answerRenderer<undefined, StoreType['showMessageButtons']>('get-config-showMessageButtons', async () => config.get('showMessageButtons'));
-ipc.answerRenderer<undefined, ThemeSource>('get-config-theme', async () => config.get('theme'));
 ipc.answerRenderer<undefined, StoreType['privateMode']>('get-config-privateMode', async () => config.get('privateMode'));
 ipc.answerRenderer<undefined, StoreType['vibrancy']>('get-config-vibrancy', async () => config.get('vibrancy'));
 ipc.answerRenderer<undefined, StoreType['sidebar']>('get-config-sidebar', async () => config.get('sidebar'));

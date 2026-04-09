@@ -4,6 +4,7 @@ import {
 	app,
 	shell,
 	Menu,
+	session,
 	MenuItemConstructorOptions,
 	dialog,
 } from 'electron';
@@ -48,8 +49,11 @@ export default async function updateMenu(): Promise<Menu> {
 	const switchItems: MenuItemConstructorOptions[] = [
 		{
 			label: 'Log Out',
-			click() {
-				sendAction('log-out');
+			async click() {
+				await session.defaultSession.clearStorageData({
+					storages: ['cookies', 'localstorage', 'indexdb', 'cachestorage'],
+				});
+				getWindow().loadURL('https://www.facebook.com/');
 			},
 		},
 	];
@@ -653,12 +657,8 @@ Press Command/Ctrl+R in Caprine to see your changes.
 
 	const helpSubmenu: MenuItemConstructorOptions[] = [
 		openUrlMenuItem({
-			label: 'Website',
-			url: 'https://github.com/sindresorhus/caprine',
-		}),
-		openUrlMenuItem({
 			label: 'Source Code',
-			url: 'https://github.com/sindresorhus/caprine',
+			url: 'https://github.com/CoreNameFlox/caprine-fork',
 		}),
 		openUrlMenuItem({
 			label: 'Donate…',
@@ -691,10 +691,19 @@ ${debugInfo()}`;
 			},
 			aboutMenuItem({
 				icon: caprineIconPath,
-				copyright: 'Created by Sindre Sorhus',
+				copyright: 'Patched by CoreNameFlox\nCreated by Sindre Sorhus',
 				text: 'Maintainers:\nDušan Simić\nLefteris Garyfalakis\nMichael Quevillon\nNikolas Spiridakis',
-				website: 'https://github.com/sindresorhus/caprine',
+				website: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 			}),
+			{
+				type: 'separator',
+			},
+			{
+				label: 'Caprine Fork on GitHub',
+				click() {
+					shell.openExternal('https://github.com/CoreNameFlox/caprine-fork');
+				},
+			},
 		);
 	}
 

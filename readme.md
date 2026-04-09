@@ -17,23 +17,24 @@
 		Caprine is feature complete. However, we welcome contributions for improvements and bug fixes.
 	</b>
 	<br>
-		<a href="https://github.com/sindresorhus/caprine">
+		<a href="https://github.com/CoreNameFlox/caprine-fork">
 		Website
 		</a>
 	<br>
-	<a href="https://github.com/sindresorhus/caprine/releases/latest">
+	<a href="https://github.com/CoreNameFlox/caprine-fork/releases/latest">
 		<img src="media/screenshot.png" width="846">
 	</a>
 </div>
 
 ## Highlights
 
+> NOTE: because the product name has been changed to Caprine Fork, this will not be the same as [Original Caprine](https://github.com/sindresorhus/caprine).
+
 - [Dark theme](#dark-mode)
 - [Vibrant theme](#vibrancy-macos-only)\*
 - [Privacy-focused](#privacy)
 - [Keyboard shortcuts](#keyboard-shortcuts)
 - [Menu bar mode](#menu-bar-mode-macos-only-)\*
-- [Work Chat support](#work-chat-support)
 - [Code blocks](#code-blocks)
 - [Touch Bar support](#touch-bar-support-macos-only)\*
 - [Custom styles](#custom-styles)
@@ -48,14 +49,7 @@
 ## Install
 
 *macOS 10.12+ (Intel and Apple Silicon), Linux (x64 and arm64), and Windows 10+ (64-bit) are supported.*
-
-Download the latest version on the [website](https://github.com/sindresorhus/caprine) or below.
-
-### macOS
-
-[**Download**](https://github.com/sindresorhus/caprine/releases/latest) the `.dmg` file.
-
-Or with [Homebrew](https://brew.sh): `$ brew install caprine`
+I'm more interested in Linux, so I'm not sure if it works.
 
 ### Linux
 
@@ -63,56 +57,38 @@ Or with [Homebrew](https://brew.sh): `$ brew install caprine`
 	<th>Distribution</th>
 	<th>Repository</th>
 	<th>Automatic Updates</th>
-	<th>Maintainer</th>
+	<th>Working</th>
 	<th>How to install</th>
 	<tr>
-		<td>Arch Linux</td>
-		<td>Community</td>
+		<td>Arch/Artix Linux</td>
+		<td>Github</td>
 		<td align="center">❌</td>
-		<td>Frederik Schwan</td>
+		<td>✅</td>
 		<td><code>pacman -S caprine</code></td>
 	</tr>
 	<tr>
-		<td>Debian / Ubuntu (manually)</td>
+		<td>Debian / Ubuntu</td>
 		<td>GitHub</td>
 		<td align="center">❌</td>
-		<td>Official</td>
+		<td>🟨</td>
 		<td>
 			<a href="https://github.com/sindresorhus/caprine/releases/latest">Download</a> the .deb file
 		</td>
 	</tr>
 	<tr>
-		<td>Debian / Ubuntu (deb-get)</td>
-		<td>GitHub</td>
-		<td align="center">❌</td>
-		<td>Official</td>
-		<td>
-			Follow the <a href=#installation-using-deb-get>instructions below</a>
-		</td>
-	</tr>
-	<tr>
-		<td>Debian / Ubuntu (APT)</td>
-		<td>Gemfury</td>
-		<td align="center">❌</td>
-		<td>Lefteris Garyfalakis</td>
-		<td>
-			Follow the <a href=#apt-repository-gemfury>instructions below</a>
-		</td>
-	</tr>
-	<tr>
 		<td>RHEL / Fedora / openSUSE</td>
-		<td>Copr</td>
+		<td>Github</td>
 		<td align="center">❌</td>
-		<td>Dušan Simić</td>
+		<td>✅</td>
 		<td>
-			Follow the <a href=#copr>instructions below</a>
+			Follow the <a href=#RPM>instructions below</a>
 		</td>
 	</tr>
 	<tr>
 		<td>AppImage</td>
 		<td>GitHub</td>
 		<td align="center">❌</td>
-		<td>Official</td>
+		<td>✅</td>
 		<td>
 			Follow the <a href=#appimage>instructions below</a>
 		</td>
@@ -148,27 +124,25 @@ sudo apt install caprine
 ```
 
 
-#### Copr:
+#### RPM:
 
 For Fedora / RHEL:
 
+[**Download**](https://github.com/CoreNameFlox/caprine-fork/releases/latest) the `.rpm` file then type
+
 ```sh
-sudo dnf copr enable dusansimic/caprine
-sudo dnf install caprine
+sudo dnf install /path/to/your/caprine.rpm
 ```
+
+Then it will install!
 
 For openSUSE:
-- Create a new file in `/etc/zypp/repos.d/caprine.repo`.
-- Copy the contents of [this file](https://copr.fedorainfracloud.org/coprs/dusansimic/caprine/repo/opensuse-tumbleweed/dusansimic-caprine-opensuse-tumbleweed.repo) and paste them into the file you just created.
+- Since I don't use OpenSUSE, there aren't any guides currently.
 
-Alternatively use the following one-liner:
-```sh
-curl -s https://copr.fedorainfracloud.org/coprs/dusansimic/caprine/repo/opensuse-tumbleweed/dusansimic-caprine-opensuse-tumbleweed.repo | sudo tee /etc/zypp/repos.d/caprine.repo
-```
 
 #### AppImage:
 
-[Download](https://github.com/sindresorhus/caprine/releases/latest) the `.AppImage` file.
+[Download](https://github.com/CoreNameFlox/caprine-fork/releases/latest) the `.AppImage` file.
 
 Make it [executable](https://discourse.appimage.org/t/how-to-run-an-appimage/80):
 
@@ -179,7 +153,7 @@ chmod +x Caprine-2.xx.x.AppImage
 Then run it!
 
 #### About immutable Linux distributions:
-[Fedora Silverblue](https://silverblue.fedoraproject.org), [Fedora Kinoite](https://kinoite.fedoraproject.org), [EndlessOS](https://endlessos.com), [CarbonOS](https://carbon.sh) and other immutable distributions only support Flatpak and/or AppImage.*
+[Fedora Silverblue](https://silverblue.fedoraproject.org), [Vanilla OS](https://vanillaos.org/), [EndlessOS](https://endlessos.com), [CarbonOS](https://carbon.sh) and other immutable distributions only support AppImage.*
 
 *Note: On some distributions Flatpak must be [pre-configured manually](https://flatpak.org/setup).*
 
@@ -273,12 +247,6 @@ Desktop notifications can be turned on in `Preferences`.
 
 You can toggle whether Caprine stays on top of other windows in the `Window`/`View` menu or with <kbd>Command/Control</kbd> <kbd>Shift</kbd> <kbd>t</kbd>.
 
-### Work Chat support
-
-Support for Work Chat: Messenger for [Workplace](https://www.facebook.com/workplace). You can switch to it in the `Caprine`/`File` menu.
-
-<div align="center"><img src="media/screenshot-work-chat.png" width="788"></div>
-
 ### Code blocks
 
 You can send code blocks by using [Markdown syntax](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#code).
@@ -342,8 +310,6 @@ Toggle "Always on Top" | <kbd>Command/Control</kbd> <kbd>Shift</kbd> <kbd>t</kbd
 Toggle window menu     | <kbd>Alt</kbd> *(Windows/Linux only)*
 Toggle main window     | <kbd>Command</kbd> <kbd>Shift</kbd> <kbd>y</kbd> *(macOS only)*
 Toggle sidebar         | <kbd>Command/Control</kbd> <kbd>Shift</kbd> <kbd>s</kbd>
-Switch to Messenger    | <kbd>Command/Control</kbd> <kbd>Shift</kbd> <kbd>1</kbd>
-Switch to Workchat     | <kbd>Command/Control</kbd> <kbd>Shift</kbd> <kbd>2</kbd>
 Preferences            | <kbd>Command/Control</kbd> <kbd>,</kbd>
 
 ###### Tip
@@ -391,15 +357,6 @@ Then edit the automatically created GitHub Releases draft and publish.
 
 - [Jarek Radosz](https://github.com/CvX)
 
-## Links
-
-- [Product Hunt post](https://www.producthunt.com/posts/caprine-2)
-
-## Press
-
-- [The Essential Windows Apps for 2018 - Lifehacker](https://lifehacker.com/lifehacker-pack-for-windows-our-list-of-the-essential-1828117805)
-- [Caprine review: Customize Facebook Messenger on Windows 10 - Windows Central](https://www.windowscentral.com/caprine-review-customizing-facebook-messenger-windows-10)
-
 ## Disclaimer
 
-Caprine is a third-party app and is not affiliated with Facebook.
+caprine-fork is a third-party app and is not affiliated with Facebook.
