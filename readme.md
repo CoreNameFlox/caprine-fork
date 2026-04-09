@@ -28,8 +28,6 @@
 
 ## Highlights
 
-> NOTE: because the product name has been changed to Caprine Fork, this will not be the same as [Original Caprine](https://github.com/sindresorhus/caprine).
-
 - [Dark theme](#dark-mode)
 - [Vibrant theme](#vibrancy-macos-only)\*
 - [Privacy-focused](#privacy)
@@ -159,31 +157,7 @@ Then run it!
 
 ### Windows
 
-<table>
-	<th>Method</th>
-	<th>Repository</th>
-	<th>Automatic Updates</th>
-	<th>Maintainer</th>
-	<th>How to install</th>
-	<tr>
-		<td>Manually</td>
-		<td>GitHub</td>
-		<td align="center">❌</td>
-		<td>Official</td>
-		<td>
-			<a href="https://github.com/sindresorhus/caprine/releases/latest">Download</a> the .exe file
-		</td>
-	</tr>
-	<tr>
-		<td>Chocolatey</td>
-		<td>Community</td>
-		<td align="center">✔️</td>
-		<td>Michael Quevillon</td>
-		<td><code>choco install caprine</code></td>
-	</tr>
-</table>
-
-*For taskbar notification badges to work on Windows 10, you'll need to [enable them in Taskbar Settings](https://www.tenforums.com/tutorials/48186-taskbar-buttons-hide-show-badges-windows-10-a.html).*
+> Not yet Implemented
 
 ## Features
 
@@ -347,6 +321,9 @@ npm run release
 Then edit the automatically created GitHub Releases draft and publish.
 
 ## Maintainers
+
+Original Caprine Developer 👑
+- [Sindre Sorhus](https://github.com/sindresorhus)
 
 - [Dušan Simić](https://github.com/dusansimic)
 - [Lefteris Garyfalakis](https://github.com/lefterisgar)
